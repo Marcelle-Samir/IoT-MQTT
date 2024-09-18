@@ -1,0 +1,10 @@
+[requires]
+boost/1.81.0
+nlohmann_json/3.11.2
+libcurl/8.2.1
+libuuid/1.0.3
+gtest/1.10.0
+
+[generators]
+CMakeDeps
+CMakeToolchain

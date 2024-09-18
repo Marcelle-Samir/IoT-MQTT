@@ -1,0 +1,15 @@
+{
+	"name": "C++ DevContainer",
+	"build": {
+	  "dockerfile": "Dockerfile",
+	  "context": "."
+	},
+	"settings": {
+	  "terminal.integrated.shell.linux": "/bin/bash"
+	},
+	"extensions": [
+	  "ms-vscode.cpptools",
+	  "ms-vscode.cmake-tools"
+	],
+	"postCreateCommand": "conan install . -s build_type=Release -of build/conan --build=missing"
+}
