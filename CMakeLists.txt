@@ -13,6 +13,10 @@ set(SOURCES
   src/main.cpp
   src/Sensor.h
   src/Sensor.cpp
+  src/TemperatureSensor.h
+  src/TemperatureSensor.cpp
+  src/LightSensor.h
+  src/LightSensor.cpp
   src/SensorsController.h
   src/SensorsController.cpp
 )
