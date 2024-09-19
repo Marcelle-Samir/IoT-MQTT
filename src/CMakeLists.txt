@@ -1,5 +1,9 @@
 add_executable(${PROJECT_NAME}
 src/main.cpp
+src/Sensor.h
+src/Sensor.cpp
+src/SensorsController.h
+src/SensorsController.cpp
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME}

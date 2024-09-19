@@ -11,6 +11,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(SOURCES
   src/main.cpp
+  src/Sensor.h
+  src/Sensor.cpp
+  src/SensorsController.h
+  src/SensorsController.cpp
 )
 
 add_executable(IoT-MQTT ${SOURCES})
