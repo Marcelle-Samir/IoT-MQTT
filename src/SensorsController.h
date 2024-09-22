@@ -2,11 +2,13 @@
 #define SENSORSCONTROLLER_H
 
 #include "Sensor.h"
-#include "TemperatureSensor.h"
-#include "LightSensor.h"
 #include <vector>
 #include <utility>
 #include <string>
+#include <memory>
+#include "TemperatureSensor.h"
+#include "LightSensor.h"
+#include "MQTTCallback.h"
 
 class SensorsController
 {
@@ -20,21 +22,24 @@ public:
         return SensorsControllerInstance;
     }
 
-    void initializeSensors();
-    void readAndProcessData();
-    std::vector<std::pair<float, long long>> getSensorValues() const { return sensorValues; }
+    std::vector<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
+    void storeValue(const std::string& sensorType, double reading);
 
 private:
     SensorsController();
     ~SensorsController();
-
+    int connect();
+    void start();
     void createTemperatureSensor();
     void createLightSensor();
-
-    void storeValue(float reading, const std::string& sensorType);
+    std::mutex sensorMutex;
 
     std::vector<Sensor*> sensors;
-    std::vector<std::pair<float, long long>> sensorValues;
+    std::vector<std::pair<std::string, double>> sensorValues;
+    TemperatureSensor* temperatureSensor = new TemperatureSensor();
+    LightSensor* lightSensor = new LightSensor();
+    mqtt::async_client client;
+    mqtt::callback* callback;
 };
 
 #endif // SENSORSCONTROLLER_H

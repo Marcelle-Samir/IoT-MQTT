@@ -10,7 +10,8 @@ public:
     ~LightSensor() override;
 
     void reportSensorReading(float reading) override;
-    std::pair<float, long long> getSensorReading() override;
+    double getSensorReading() override;
+    void run(mqtt::async_client& client) override;
 };
 
 #endif // LIGHTSENSOR_H

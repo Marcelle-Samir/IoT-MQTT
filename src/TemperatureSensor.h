@@ -10,7 +10,8 @@ public:
     ~TemperatureSensor() override;
 
     void reportSensorReading(float reading) override;
-    std::pair<float, long long> getSensorReading() override;
+    double getSensorReading() override;
+    void run(mqtt::async_client& client) override;
 };
 
 #endif // TEMPERATURESENSOR_H

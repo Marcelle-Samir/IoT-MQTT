@@ -1,5 +1,7 @@
 add_executable(${PROJECT_NAME}
 src/main.cpp
+src/MQTTCallback.h
+src/MQTTCallback.cpp
 src/Sensor.h
 src/Sensor.cpp
 src/TemperatureSensor.h
