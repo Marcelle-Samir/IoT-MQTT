@@ -1,40 +1,29 @@
 #include "SensorsController.h"
 #include <iostream>
 #include <chrono>
-#include <memory>
 
 SensorsController::SensorsController()
-    : client("tcp://localhost:1883", "sensors_controller"), 
-      callback(new MQTTCallback())
+    : client("tcp://localhost:1883", "sensorsController"), 
+      callback(std::make_unique<MQTTCallback>()),
+      temperatureSensor(std::make_unique<TemperatureSensor>()),
+      lightSensor(std::make_unique<LightSensor>())
 {
     client.set_callback(*callback);
     if(connect())
     {
         std::cerr << "ERROR: MQTT connection error" << std::endl;
+        std::cout << "Attempting to connect to MQTT broker at " << client.get_server_uri() << std::endl;
     }
     else
     {
         std::cout << "Connected to MQTT server." << std::endl;
     }
-    createTemperatureSensor();
-    createLightSensor();
+    sensors.push_back(std::move(temperatureSensor));
+    sensors.push_back(std::move(lightSensor));
 }
 
 SensorsController::~SensorsController()
 {
-    delete callback;
-    for (Sensor* sensor : sensors)
-    {
-        delete sensor;
-    }
-}
-
-void SensorsController::start() {
-    std::thread tempThread(&TemperatureSensor::run, temperatureSensor, std::ref(client));
-    std::thread lightThread(&LightSensor::run, lightSensor, std::ref(client));
-    
-    tempThread.detach();
-    lightThread.detach();
 }
 
 int SensorsController::connect()
@@ -54,20 +43,7 @@ int SensorsController::connect()
         std::cerr << "MQTT connection error: " << e.what() << std::endl;
         return 1;
     }
-
     return 0;
-}
-
-void SensorsController::createTemperatureSensor()
-{
-    temperatureSensor = new TemperatureSensor();
-    sensors.push_back(temperatureSensor);
-}
-
-void SensorsController::createLightSensor()
-{
-    lightSensor = new LightSensor();
-    sensors.push_back(lightSensor);
 }
 
 void SensorsController::storeValue(const std::string& sensorType, double reading)

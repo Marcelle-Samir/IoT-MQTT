@@ -18,8 +18,8 @@ public:
 
     static SensorsController& getInstance()
     {
-        static SensorsController SensorsControllerInstance;
-        return SensorsControllerInstance;
+        static SensorsController instance;
+        return instance;
     }
 
     std::vector<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
@@ -34,12 +34,12 @@ private:
     void createLightSensor();
     std::mutex sensorMutex;
 
-    std::vector<Sensor*> sensors;
+    std::vector<std::unique_ptr<Sensor>> sensors;
     std::vector<std::pair<std::string, double>> sensorValues;
-    TemperatureSensor* temperatureSensor = new TemperatureSensor();
-    LightSensor* lightSensor = new LightSensor();
+    std::unique_ptr<TemperatureSensor> temperatureSensor;
+    std::unique_ptr<LightSensor> lightSensor;
     mqtt::async_client client;
-    mqtt::callback* callback;
+    std::unique_ptr<MQTTCallback> callback;
 };
 
 #endif // SENSORSCONTROLLER_H
