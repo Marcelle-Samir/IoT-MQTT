@@ -12,6 +12,11 @@ RUN apt-get update && \
     uuid-dev \
     python3 \
     python3-pip \
+    build-essential \
+    cmake \
+    git \
+    mosquitto \
+    mosquitto-clients \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and npm (for running json-server)

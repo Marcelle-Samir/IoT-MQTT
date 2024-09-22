@@ -27,14 +27,14 @@ find_package(nlohmann_json REQUIRED)
 find_package(CURL REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(eclipse-paho-mqtt-c REQUIRED)
-
+find_package(PahoMqttCpp REQUIRED)
 pkg_check_modules(UUID REQUIRED uuid)
 
 target_link_libraries(IoT-MQTT
     nlohmann_json::nlohmann_json
     CURL::libcurl
-    ${UUID_LIBRARIES}
-    ${PahoMqttC_LIBRARIES}
+    eclipse-paho-mqtt-c::paho-mqtt3as-static
+    PahoMqttCpp::paho-mqttpp3-static
     pthread
 )
 
