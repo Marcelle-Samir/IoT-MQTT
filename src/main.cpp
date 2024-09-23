@@ -6,7 +6,7 @@ int main()
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
 
-    SensorsController& m_SensorsController = SensorsController::getInstance();
+    SensorsController& m_SensorsController = SensorsController::getInstance(20);
 
     auto port = 9080;
     RestApi restApi(Pistache::Address(Pistache::Ipv4::any(), Pistache::Port(port)), m_SensorsController);

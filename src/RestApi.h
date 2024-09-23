@@ -12,7 +12,8 @@ public:
     RestApi(const Pistache::Address& address, SensorsController& controller);
     void start();
     void setupRoutes();
-    void getSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+    void getAllSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+    void getSpecificSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
 
 private:
     SensorsController& sensorsController;

@@ -2,11 +2,12 @@
 #include <iostream>
 #include <chrono>
 
-SensorsController::SensorsController()
-    : client("tcp://localhost:1883", "sensorsController"), 
+SensorsController::SensorsController(size_t maxSize)
+    : client("tcp://localhost:1883", "sensorsController"),
       callback(std::make_unique<MQTTCallback>()),
       temperatureSensor(std::make_unique<TemperatureSensor>()),
-      lightSensor(std::make_unique<LightSensor>())
+      lightSensor(std::make_unique<LightSensor>()),
+      maxSensorValuesSize(maxSize)
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
     if(startMosquitto())
@@ -81,6 +82,10 @@ void SensorsController::storeValue(const std::string& sensorType, double reading
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
     std::lock_guard<std::mutex> lock(sensorMutex);
+    if (sensorValues.size() >= maxSensorValuesSize)
+    {
+        sensorValues.pop_front();
+    }
     sensorValues.push_back({sensorType, reading});
     std::cout << "Stored reading from " << sensorType << ": " << reading << std::endl;
 }
@@ -108,6 +113,20 @@ std::string SensorsController::getSensorData()
     for (const auto& reading : sensorValues)
     {
         data += reading.first + ": " + std::to_string(reading.second) + "\n";
+    }
+    return data;
+}
+
+std::string SensorsController::getSpecificSensorData(const std::string& sensorType)
+{
+    std::lock_guard<std::mutex> lock(sensorMutex);
+    std::string data;
+    for (const auto& reading : sensorValues)
+    {
+        if (reading.first == sensorType)
+        {
+            data += reading.first + ": " + std::to_string(reading.second) + "\n";
+        }
     }
     return data;
 }

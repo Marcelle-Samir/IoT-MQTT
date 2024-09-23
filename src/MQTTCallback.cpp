@@ -3,7 +3,7 @@
 
 void MQTTCallback::storeSensorReading(const std::string& sensorType, double reading)
 {
-    SensorsController::getInstance().storeValue(sensorType, reading);
+    SensorsController::getInstance(20).storeValue(sensorType, reading);
 }
 
 void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
