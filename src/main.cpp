@@ -3,7 +3,8 @@
 
 int main()
 {
-    std::cout << "main started" << std::endl;
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
+
     SensorsController& m_SensorsController = SensorsController::getInstance();
     
     std::this_thread::sleep_for(std::chrono::hours(1));

@@ -8,6 +8,7 @@ void MQTTCallback::storeSensorReading(const std::string& sensorType, double read
 
 void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
     std::cout << "Message arrived: " << msg->get_topic() << " -> " << msg->to_string() << std::endl;
     std::string topic = msg->get_topic();
     double reading = std::stod(msg->get_payload_str());

@@ -8,6 +8,7 @@ SensorsController::SensorsController()
       temperatureSensor(std::make_unique<TemperatureSensor>()),
       lightSensor(std::make_unique<LightSensor>())
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
     if(startMosquitto())
     {
         std::cerr << "ERROR: startMosquitto failed" << std::endl;
@@ -37,6 +38,8 @@ SensorsController::SensorsController()
 
 SensorsController::~SensorsController()
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
+
     if (tempSensorThread.joinable())
     {
         tempSensorThread.join();
@@ -49,6 +52,7 @@ SensorsController::~SensorsController()
 
 int SensorsController::connect()
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
     mqtt::connect_options connOpts;
     connOpts.set_clean_session(true);
     connOpts.set_keep_alive_interval(20);
@@ -75,6 +79,7 @@ int SensorsController::connect()
 
 void SensorsController::storeValue(const std::string& sensorType, double reading)
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
     std::lock_guard<std::mutex> lock(sensorMutex);
     sensorValues.push_back({sensorType, reading});
     std::cout << "Stored reading from " << sensorType << ": " << reading << std::endl;
@@ -82,6 +87,7 @@ void SensorsController::storeValue(const std::string& sensorType, double reading
 
 int SensorsController::startMosquitto()
 {
+    std::cout << __FUNCTION__ << " is Called." << std::endl;
     int result = system("mosquitto -c /etc/mosquitto/mosquitto.conf &");
     if (result == -1)
     {

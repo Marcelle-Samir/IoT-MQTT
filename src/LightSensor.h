@@ -9,8 +9,8 @@ public:
     LightSensor();
     ~LightSensor() override;
 
-    void reportSensorReading(float reading) override;
     double getSensorReading() override;
+    double generateReading() override;
     void run(mqtt::async_client& client) override;
 };
 
