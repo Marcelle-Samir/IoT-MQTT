@@ -100,3 +100,14 @@ int SensorsController::startMosquitto()
         return 0;
     }
 }
+
+std::string SensorsController::getSensorData()
+{
+    std::lock_guard<std::mutex> lock(sensorMutex);
+    std::string data;
+    for (const auto& reading : sensorValues)
+    {
+        data += reading.first + ": " + std::to_string(reading.second) + "\n";
+    }
+    return data;
+}

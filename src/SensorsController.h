@@ -24,7 +24,7 @@ public:
 
     std::vector<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
     void storeValue(const std::string& sensorType, double reading);
-
+    std::string getSensorData();
 private:
     SensorsController();
     ~SensorsController();

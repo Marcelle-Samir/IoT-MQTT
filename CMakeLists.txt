@@ -13,6 +13,8 @@ set(SOURCES
   src/main.cpp
   src/MQTTCallback.h
   src/MQTTCallback.cpp
+  src/RestApi.h
+  src/RestApi.cpp
   src/Sensor.h
   src/Sensor.cpp
   src/TemperatureSensor.h
@@ -30,6 +32,7 @@ find_package(CURL REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(eclipse-paho-mqtt-c REQUIRED)
 find_package(PahoMqttCpp REQUIRED)
+find_package(Pistache REQUIRED)
 pkg_check_modules(UUID REQUIRED uuid)
 
 target_link_libraries(IoT-MQTT
@@ -37,6 +40,7 @@ target_link_libraries(IoT-MQTT
     CURL::libcurl
     eclipse-paho-mqtt-c::paho-mqtt3as-static
     PahoMqttCpp::paho-mqttpp3-static
+    Pistache::Pistache
     pthread
 )
 
