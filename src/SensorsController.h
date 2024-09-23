@@ -29,15 +29,14 @@ private:
     SensorsController();
     ~SensorsController();
     int connect();
-    void start();
-    void createTemperatureSensor();
-    void createLightSensor();
     std::mutex sensorMutex;
-
+    bool running = true;
     std::vector<std::unique_ptr<Sensor>> sensors;
     std::vector<std::pair<std::string, double>> sensorValues;
     std::unique_ptr<TemperatureSensor> temperatureSensor;
     std::unique_ptr<LightSensor> lightSensor;
+    std::thread tempSensorThread;
+    std::thread lightSensorThread;
     mqtt::async_client client;
     std::unique_ptr<MQTTCallback> callback;
 };

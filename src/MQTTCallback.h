@@ -5,7 +5,8 @@
 
 class SensorsController;
 
-class MQTTCallback : public virtual mqtt::callback, public virtual mqtt::iaction_listener {
+class MQTTCallback : public virtual mqtt::callback, public virtual mqtt::iaction_listener
+{
 public:
     void message_arrived(mqtt::const_message_ptr msg) override;
 

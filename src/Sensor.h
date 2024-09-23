@@ -6,7 +6,8 @@
 #include <ctime>
 #include <mqtt/async_client.h>
 
-class Sensor {
+class Sensor
+{
 public:
     Sensor();
     virtual ~Sensor();

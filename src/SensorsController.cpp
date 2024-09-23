@@ -18,12 +18,24 @@ SensorsController::SensorsController()
     {
         std::cout << "Connected to MQTT server." << std::endl;
     }
+
+    tempSensorThread = std::thread(&TemperatureSensor::run, temperatureSensor.get(), std::ref(client));
+    lightSensorThread = std::thread(&LightSensor::run, lightSensor.get(), std::ref(client));
+
     sensors.push_back(std::move(temperatureSensor));
     sensors.push_back(std::move(lightSensor));
 }
 
 SensorsController::~SensorsController()
 {
+    if (tempSensorThread.joinable())
+    {
+        tempSensorThread.join();
+    }
+    if (lightSensorThread.joinable())
+    {
+        lightSensorThread.join();
+    }
 }
 
 int SensorsController::connect()
@@ -31,19 +43,24 @@ int SensorsController::connect()
     mqtt::connect_options connOpts;
     connOpts.set_clean_session(true);
     connOpts.set_keep_alive_interval(20);
-    try
+    int retries = 5;
+    while (retries--)
     {
-        client.connect(connOpts)->wait();
-        std::cout << "Connected to MQTT server." << std::endl;
-        client.subscribe("sensors/temperature", 1);
-        client.subscribe("sensors/light", 1);
+        try
+        {
+            client.connect(connOpts)->wait();
+            std::cout << "Connected to MQTT server." << std::endl;
+            client.subscribe("sensors/temperature", 1);
+            client.subscribe("sensors/light", 1);
+            return 0;
+        }
+        catch (const mqtt::exception& e)
+        {
+            std::cerr << "MQTT connection error: " << e.what() << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
     }
-    catch (const mqtt::exception& e)
-    {
-        std::cerr << "MQTT connection error: " << e.what() << std::endl;
-        return 1;
-    }
-    return 0;
+    return 1;
 }
 
 void SensorsController::storeValue(const std::string& sensorType, double reading)
