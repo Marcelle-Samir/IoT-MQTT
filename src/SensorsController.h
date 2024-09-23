@@ -28,6 +28,7 @@ public:
 private:
     SensorsController();
     ~SensorsController();
+    int startMosquitto();
     int connect();
     std::mutex sensorMutex;
     bool running = true;
