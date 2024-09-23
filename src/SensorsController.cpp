@@ -2,12 +2,9 @@
 #include <iostream>
 #include <chrono>
 
-SensorsController::SensorsController(size_t maxSize)
+SensorsController::SensorsController()
     : client("tcp://localhost:1883", "sensorsController"),
-      callback(std::make_unique<MQTTCallback>()),
-      temperatureSensor(std::make_unique<TemperatureSensor>()),
-      lightSensor(std::make_unique<LightSensor>()),
-      maxSensorValuesSize(maxSize)
+      callback(std::make_unique<MQTTCallback>())
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
     if(startMosquitto())
@@ -30,11 +27,25 @@ SensorsController::SensorsController(size_t maxSize)
         std::cout << "Connected to MQTT server." << std::endl;
     }
 
+    createSensors();
+}
+
+void SensorsController::createSensors()
+{
+    std::string temperatureSensorId = "Temperature_" + std::to_string(sensorIdCounter++);
+    std::string lightSensorId = "Light_" + std::to_string(sensorIdCounter++);
+
+    temperatureSensor = std::make_unique<TemperatureSensor>(LIGHT_SENSORS_READINGS_LIMIT, temperatureSensorId);
+    lightSensor = std::make_unique<LightSensor>(TEMP_SENSORS_READINGS_LIMIT, lightSensorId);
+
     tempSensorThread = std::thread(&TemperatureSensor::run, temperatureSensor.get(), std::ref(client));
     lightSensorThread = std::thread(&LightSensor::run, lightSensor.get(), std::ref(client));
 
     sensors.push_back(std::move(temperatureSensor));
     sensors.push_back(std::move(lightSensor));
+
+    tempSensorThread.detach();
+    lightSensorThread.detach();
 }
 
 SensorsController::~SensorsController()
@@ -56,7 +67,7 @@ int SensorsController::connect()
     std::cout << __FUNCTION__ << " is Called." << std::endl;
     mqtt::connect_options connOpts;
     connOpts.set_clean_session(true);
-    connOpts.set_keep_alive_interval(20);
+    connOpts.set_keep_alive_interval(60);
     int retries = 5;
     while (retries--)
     {
@@ -65,8 +76,8 @@ int SensorsController::connect()
         {
             client.connect(connOpts)->wait();
             std::cout << "Connected to MQTT server." << std::endl;
-            client.subscribe("sensors/temperature", 1);
-            client.subscribe("sensors/light", 1);
+            client.subscribe("sensors/#", 1);
+
             return 0;
         }
         catch (const mqtt::exception& e)
@@ -78,16 +89,63 @@ int SensorsController::connect()
     return 1;
 }
 
-void SensorsController::storeValue(const std::string& sensorType, double reading)
+void SensorsController::storeValue(const std::string& sensorId, double reading)
+{
+    std::cout << __FUNCTION__ << "is Called in SensorsController." << std::endl;
+    std::lock_guard<std::mutex> lock(sensorMutex);
+    for (const auto& sensor : sensors)
+    {
+        if (sensor->getSensorId() == sensorId)
+        {
+            std::cout << "Sensor ID matched: " << sensor->getSensorId() << std::endl;
+            sensor->storeValue(reading);
+            return;
+        }
+    }
+    std::cerr << "No matching sensor found for ID: " << sensorId << std::endl;
+
+}
+
+std::string SensorsController::getSensorData(const std::string& sensorType)
+{
+    std::string data;
+    for (const auto& sensor : sensors)
+    {
+        if (sensor->getSensorId() == sensorType)
+        {
+            data = sensor->getSensorData();
+            break;
+        }
+    }
+    return data;
+}
+
+std::string SensorsController::getSpecificSensorData(const std::string& requestedSensorId)
+{
+
+    std::cout << __FUNCTION__ << "requested sensor data for ID: " << requestedSensorId << std::endl;
+    std::string data;
+    for (const auto& sensor : sensors)
+    {
+        if (sensor->getSensorId() == requestedSensorId)
+        {
+            std::cout << __FUNCTION__ << sensor->getSensorId() << " sensor data" << std::endl;
+            data = sensor->getSpecificSensorData(requestedSensorId);
+            break;
+        }
+    }
+    return data;
+}
+
+std::vector<std::string> SensorsController::getCreatedSensorsList()
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
-    std::lock_guard<std::mutex> lock(sensorMutex);
-    if (sensorValues.size() >= maxSensorValuesSize)
+    std::vector<std::string> sensorsList;
+    for (const auto& sensor : sensors)
     {
-        sensorValues.pop_front();
+        sensorsList.push_back(sensor->getSensorId());
     }
-    sensorValues.push_back({sensorType, reading});
-    std::cout << "Stored reading from " << sensorType << ": " << reading << std::endl;
+    return sensorsList;
 }
 
 int SensorsController::startMosquitto()
@@ -104,29 +162,4 @@ int SensorsController::startMosquitto()
         std::cout << "Mosquitto started." << std::endl;
         return 0;
     }
-}
-
-std::string SensorsController::getSensorData()
-{
-    std::lock_guard<std::mutex> lock(sensorMutex);
-    std::string data;
-    for (const auto& reading : sensorValues)
-    {
-        data += reading.first + ": " + std::to_string(reading.second) + "\n";
-    }
-    return data;
-}
-
-std::string SensorsController::getSpecificSensorData(const std::string& sensorType)
-{
-    std::lock_guard<std::mutex> lock(sensorMutex);
-    std::string data;
-    for (const auto& reading : sensorValues)
-    {
-        if (reading.first == sensorType)
-        {
-            data += reading.first + ": " + std::to_string(reading.second) + "\n";
-        }
-    }
-    return data;
 }

@@ -17,7 +17,7 @@ public:
     void delivery_complete(mqtt::delivery_token_ptr token) override;
 
 private:
-    void storeSensorReading(const std::string& sensorType, double reading);
+    void storeSensorReading(const std::string& sensorId, double reading);
 };
 
 #endif // MQTTCALLBACK_H

@@ -11,20 +11,23 @@
 class Sensor
 {
 public:
-    Sensor();
     virtual ~Sensor();
-
+    Sensor(size_t maxReadingSize, const std::string& id)
+        : maxSensorValuesSize(maxReadingSize), sensorId(id) {}
     virtual double getSensorReading() = 0;
     virtual double generateReading() = 0;
-    void displayData();
     virtual void run(mqtt::async_client& client) = 0;
+    virtual void storeValue(double reading) = 0;
+    virtual std::string getSensorData() = 0;
+    virtual std::string getSpecificSensorData(const std::string& sensorType) = 0;
+    virtual std::string generateSensorId() const = 0;
+    std::string getSensorId() const { return sensorId; }
 
 protected:
     void publishReading(mqtt::async_client& client, const std::string& topic, double value);
+    std::string sensorId;
+    size_t maxSensorValuesSize;
 
-private:
-    float sensorReading;
-    long long readingTime;
 };
 
 #endif // SENSOR_H

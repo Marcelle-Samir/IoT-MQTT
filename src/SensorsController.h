@@ -11,6 +11,9 @@
 #include "LightSensor.h"
 #include "MQTTCallback.h"
 
+#define LIGHT_SENSORS_READINGS_LIMIT    15
+#define TEMP_SENSORS_READINGS_LIMIT     20
+
 class SensorsController
 {
 public:
@@ -18,22 +21,23 @@ public:
     SensorsController& operator=(const SensorsController&) = delete;
 
     std::deque<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
-    void storeValue(const std::string& sensorType, double reading);
-    std::string getSensorData();
-    std::string getSpecificSensorData(const std::string& sensorType);
+    void storeValue(const std::string& sensorId, double reading);
+    std::string getSensorData(const std::string& sensorType);
+    std::string getSpecificSensorData(const std::string& requestedSensorId);
+    std::vector<std::string> getCreatedSensorsList();
 
-    static SensorsController& getInstance(size_t maxSize)
+    static SensorsController& getInstance()
     {
-        static SensorsController instance(maxSize);
+        static SensorsController instance;
         return instance;
     }
 
 private:
-    SensorsController(size_t maxSize);
+    SensorsController();
     ~SensorsController();
     int startMosquitto();
     int connect();
-    size_t maxSensorValuesSize;
+    void createSensors();
     std::mutex sensorMutex;
     bool running = true;
     std::vector<std::unique_ptr<Sensor>> sensors;
@@ -44,6 +48,7 @@ private:
     std::thread lightSensorThread;
     mqtt::async_client client;
     std::unique_ptr<MQTTCallback> callback;
+    int sensorIdCounter = 0;
 };
 
 #endif // SENSORSCONTROLLER_H

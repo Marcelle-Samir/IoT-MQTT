@@ -1,9 +1,10 @@
 #include "MQTTCallback.h"
 #include "SensorsController.h"
 
-void MQTTCallback::storeSensorReading(const std::string& sensorType, double reading)
+void MQTTCallback::storeSensorReading(const std::string& sensorId, double reading)
 {
-    SensorsController::getInstance(20).storeValue(sensorType, reading);
+    std::cout << "Storing reading for sensorId: " << sensorId << std::endl;
+    SensorsController::getInstance().storeValue(sensorId, reading);
 }
 
 void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
@@ -12,16 +13,31 @@ void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
     std::cout << "Message arrived: " << msg->get_topic() << " -> " << msg->to_string() << std::endl;
     std::string topic = msg->get_topic();
     double reading = std::stod(msg->get_payload_str());
-    std::string sensorType;
-    if (topic == "sensors/temperature")
+    std::string m_sensorId;
+
+    if (topic == "sensors")
     {
-        sensorType = "TemperatureSensor";
+        std::vector<std::string> sensorsList = SensorsController::getInstance().getCreatedSensorsList();
+        for (const auto& sensor : sensorsList)
+        {
+            std::cout << sensor << std::endl;
+        }
     }
-    else if (topic == "sensors/light")
+    else
     {
-        sensorType = "LightSensor";
+        size_t lastSlashPos = topic.find_last_of('/');
+        if (lastSlashPos != std::string::npos)
+        {
+            m_sensorId = topic.substr(lastSlashPos + 1);
+        }
+        else
+        {
+            std::cerr << "Unexpected topic format: " << topic << std::endl;
+            return;
+        }
     }
-    storeSensorReading(sensorType, reading);
+
+    storeSensorReading(m_sensorId, reading);
 }
 
 void MQTTCallback::on_failure(const mqtt::token& tok)
