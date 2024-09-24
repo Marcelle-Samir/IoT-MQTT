@@ -34,18 +34,23 @@ void SensorsController::createSensors()
 {
     std::string temperatureSensorId = "Temperature_" + std::to_string(sensorIdCounter++);
     std::string lightSensorId = "Light_" + std::to_string(sensorIdCounter++);
+    std::string lightSensorIdSec = "Light_" + std::to_string(sensorIdCounter++);
 
     temperatureSensor = std::make_unique<TemperatureSensor>(LIGHT_SENSORS_READINGS_LIMIT, temperatureSensorId);
     lightSensor = std::make_unique<LightSensor>(TEMP_SENSORS_READINGS_LIMIT, lightSensorId);
+    lightSensorSec = std::make_unique<LightSensor>(TEMP_SENSORS_READINGS_LIMIT, lightSensorIdSec);
 
     tempSensorThread = std::thread(&TemperatureSensor::run, temperatureSensor.get(), std::ref(client));
     lightSensorThread = std::thread(&LightSensor::run, lightSensor.get(), std::ref(client));
+    lightSensorThreadSec = std::thread(&LightSensor::run, lightSensorSec.get(), std::ref(client));
 
     sensors.push_back(std::move(temperatureSensor));
     sensors.push_back(std::move(lightSensor));
+    sensors.push_back(std::move(lightSensorSec));
 
     tempSensorThread.detach();
     lightSensorThread.detach();
+    lightSensorThreadSec.detach();
 }
 
 SensorsController::~SensorsController()

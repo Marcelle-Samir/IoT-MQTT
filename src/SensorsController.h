@@ -44,8 +44,10 @@ private:
     std::deque<std::pair<std::string, double>> sensorValues;
     std::unique_ptr<TemperatureSensor> temperatureSensor;
     std::unique_ptr<LightSensor> lightSensor;
+    std::unique_ptr<LightSensor> lightSensorSec;
     std::thread tempSensorThread;
     std::thread lightSensorThread;
+    std::thread lightSensorThreadSec;
     mqtt::async_client client;
     std::unique_ptr<MQTTCallback> callback;
     int sensorIdCounter = 0;

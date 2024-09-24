@@ -71,7 +71,7 @@ void RestApi::calculateSensorData(const Pistache::Rest::Request& request, Pistac
 
         std::string jsonResponse = "{\"averageReading\": " + std::to_string(data.averageReading) +
                                    ", \"minReading\": " + std::to_string(data.minReading) +
-                                   ", \"maxReading\": " + std::to_string(data.maxReading) + "}";
+                                   ", \"maxReading\": " + std::to_string(data.maxReading) + "}\n";
 
         if (data.averageReading == 0.0 && data.minReading == std::numeric_limits<double>::max() &&
             data.maxReading == std::numeric_limits<double>::min())
