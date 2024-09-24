@@ -10,6 +10,7 @@
 #include "TemperatureSensor.h"
 #include "LightSensor.h"
 #include "MQTTCallback.h"
+#include "SensorData.h"
 
 #define LIGHT_SENSORS_READINGS_LIMIT    15
 #define TEMP_SENSORS_READINGS_LIMIT     20
@@ -25,7 +26,7 @@ public:
     std::string getSensorData(const std::string& sensorType);
     std::string getSpecificSensorData(const std::string& requestedSensorId);
     std::vector<std::string> getCreatedSensorsList();
-    double calculateSensorData(const std::string& sensorId);
+    SensorData calculateSensorData(const std::string& sensorId);
     static SensorsController& getInstance()
     {
         static SensorsController instance;

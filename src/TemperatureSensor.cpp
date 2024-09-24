@@ -67,12 +67,24 @@ std::string TemperatureSensor::getSpecificSensorData(const std::string& requeste
     return data;
 }
 
-double TemperatureSensor::calculateSensorData()
+SensorData TemperatureSensor::calculateSensorData()
 {
+    SensorData m_sensorData;
     double sum = 0.0;
-    for (const auto& reading : sensorValues)
-    {
-        sum += reading.second;
+    double minReading = std::numeric_limits<double>::max();
+    double maxReading = std::numeric_limits<double>::lowest();
+    for (const auto& reading : sensorValues) {
+        double value = reading.second;
+        sum += value;
+        if (value < minReading) {
+            minReading = value;
+        }
+        if (value > maxReading) {
+            maxReading = value;
+        }
     }
-    return sensorValues.empty() ? 0.0 : sum / sensorValues.size();
+    m_sensorData.averageReading = sensorValues.empty() ? 0.0 : sum / sensorValues.size();
+    m_sensorData.minReading = sensorValues.empty() ? 0.0 : minReading;
+    m_sensorData.maxReading = sensorValues.empty() ? 0.0 : maxReading;
+    return m_sensorData;
 }

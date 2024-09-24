@@ -164,14 +164,16 @@ int SensorsController::startMosquitto()
     }
 }
 
-double SensorsController::calculateSensorData(const std::string& sensorId) {
+SensorData SensorsController::calculateSensorData(const std::string& sensorId)
+{
     std::lock_guard<std::mutex> lock(sensorMutex);
+    SensorData m_sensorData;
     for (const auto& sensor : sensors)
     {
         if (sensor->getSensorId() == sensorId) {
-            return sensor->calculateSensorData();
+            m_sensorData = sensor->calculateSensorData();
+            break;
         }
     }
-    std::cerr << "No matching sensor found for ID: " << sensorId << std::endl;
-    return 0.0;
+    return m_sensorData;
 }

@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 #include <mqtt/async_client.h>
+#include "SensorData.h"
 
 class Sensor
 {
@@ -22,13 +23,12 @@ public:
     virtual std::string getSpecificSensorData(const std::string& sensorType) = 0;
     virtual std::string generateSensorId() const = 0;
     std::string getSensorId() const { return sensorId; }
-    virtual double calculateSensorData() = 0;
+    virtual SensorData calculateSensorData() = 0;
 
 protected:
     void publishReading(mqtt::async_client& client, const std::string& topic, double value);
     std::string sensorId;
     size_t maxSensorValuesSize;
-
 };
 
 #endif // SENSOR_H

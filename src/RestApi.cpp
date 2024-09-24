@@ -22,7 +22,7 @@ void RestApi::setupRoutes()
     Rest::Router router;
     Routes::Get(router, "/sensors", Routes::bind(&RestApi::listAllSensors, this));
     Routes::Get(router, "/sensors/:sensorType", Routes::bind(&RestApi::getSpecificSensorData, this));
-    Routes::Get(router, "/sensors/:sensorType/data", Routes::bind(&RestApi::getSensorData, this)); // New route for data
+    Routes::Get(router, "/sensors/:sensorType/data", Routes::bind(&RestApi::calculateSensorData, this));
 
     httpEndpoint.setHandler(router.handler());
 }
@@ -65,7 +65,8 @@ void RestApi::getSpecificSensorData(const Pistache::Rest::Request& request, Pist
     }
 }
 
-void RestApi::listAllSensors(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response) {
+void RestApi::listAllSensors(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response)
+{
     std::vector<std::string> sensorsList = SensorsController::getInstance().getCreatedSensorsList();
     std::ostringstream sensorData;
     for (const auto& sensor : sensorsList)
@@ -76,25 +77,30 @@ void RestApi::listAllSensors(const Pistache::Rest::Request&, Pistache::Http::Res
     response.send(Pistache::Http::Code::Ok, sensorData.str());
 }
 
-void RestApi::getSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
+void RestApi::calculateSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
 {
-    auto sensorId = request.param(":sensorType").as<std::string>();
     try
     {
-        double averageReading = sensorsController.calculateSensorData(sensorId);
+        auto sensorType = request.param(":sensorType").as<std::string>();
+        SensorData data = sensorsController.calculateSensorData(sensorType);
 
-        if (averageReading == 0.0)
+        std::string jsonResponse = "{\"averageReading\": " + std::to_string(data.averageReading) +
+                                   ", \"minReading\": " + std::to_string(data.minReading) +
+                                   ", \"maxReading\": " + std::to_string(data.maxReading) + "}";
+
+        if (data.averageReading == 0.0 && data.minReading == std::numeric_limits<double>::max() &&
+            data.maxReading == std::numeric_limits<double>::min())
         {
-            response.send(Pistache::Http::Code::Not_Found, "Sensor data not found or no readings available");
+            response.send(Pistache::Http::Code::Not_Found, "Sensor data not found");
         }
         else
         {
-            response.send(Pistache::Http::Code::Ok, std::to_string(averageReading));
+            response.send(Pistache::Http::Code::Ok, jsonResponse);
         }
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error getting sensor data: " << e.what() << std::endl;
+        std::cerr << "Error getting specific sensor data: " << e.what() << std::endl;
         response.send(Pistache::Http::Code::Internal_Server_Error, "Error retrieving data");
     }
 }

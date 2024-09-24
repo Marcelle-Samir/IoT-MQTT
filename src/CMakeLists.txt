@@ -1,5 +1,6 @@
 add_executable(${PROJECT_NAME}
 src/main.cpp
+src/SensorData.h
 src/MQTTCallback.h
 src/MQTTCallback.cpp
 src/RestApi.h

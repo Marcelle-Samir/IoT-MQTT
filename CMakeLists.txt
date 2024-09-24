@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(SOURCES
   src/main.cpp
+  src/SensorData.h
   src/MQTTCallback.h
   src/MQTTCallback.cpp
   src/RestApi.h

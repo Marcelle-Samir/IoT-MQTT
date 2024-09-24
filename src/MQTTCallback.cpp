@@ -30,7 +30,7 @@ void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
         if (end != std::string::npos)
         {
             m_sensorId = topic.substr(start, end - start);
-            double averageReading = SensorsController::getInstance().calculateSensorData(m_sensorId);
+            SensorData m_sensorData = SensorsController::getInstance().calculateSensorData(m_sensorId);
             return;
         }
         else

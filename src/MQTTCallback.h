@@ -2,6 +2,7 @@
 #define MQTTCALLBACK_H
 
 #include <mqtt/async_client.h>
+#include "SensorData.h"
 
 class SensorsController;
 
