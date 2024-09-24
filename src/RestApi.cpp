@@ -22,6 +22,7 @@ void RestApi::setupRoutes()
     Rest::Router router;
     Routes::Get(router, "/sensors", Routes::bind(&RestApi::listAllSensors, this));
     Routes::Get(router, "/sensors/:sensorType", Routes::bind(&RestApi::getSpecificSensorData, this));
+    Routes::Get(router, "/sensors/:sensorType/data", Routes::bind(&RestApi::getSensorData, this)); // New route for data
 
     httpEndpoint.setHandler(router.handler());
 }
@@ -73,4 +74,27 @@ void RestApi::listAllSensors(const Pistache::Rest::Request&, Pistache::Http::Res
         sensorData << sensor << "\n";
     }
     response.send(Pistache::Http::Code::Ok, sensorData.str());
+}
+
+void RestApi::getSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
+{
+    auto sensorId = request.param(":sensorType").as<std::string>();
+    try
+    {
+        double averageReading = sensorsController.calculateSensorData(sensorId);
+
+        if (averageReading == 0.0)
+        {
+            response.send(Pistache::Http::Code::Not_Found, "Sensor data not found or no readings available");
+        }
+        else
+        {
+            response.send(Pistache::Http::Code::Ok, std::to_string(averageReading));
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error getting sensor data: " << e.what() << std::endl;
+        response.send(Pistache::Http::Code::Internal_Server_Error, "Error retrieving data");
+    }
 }

@@ -72,3 +72,13 @@ std::string LightSensor::getSpecificSensorData(const std::string& requestedSenso
     }
     return data;
 }
+
+double LightSensor::calculateSensorData()
+{
+    double sum = 0.0;
+    for (const auto& reading : sensorValues)
+    {
+        sum += reading.second;
+    }
+    return sensorValues.empty() ? 0.0 : sum / sensorValues.size();
+}

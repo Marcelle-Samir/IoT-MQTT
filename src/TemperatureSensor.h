@@ -19,6 +19,7 @@ public:
     std::string getSpecificSensorData(const std::string& requestedSensorId) override;
     std::deque<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
     std::string generateSensorId() const override { return sensorId; }
+    double calculateSensorData() override;
 
 private:
     size_t maxSensorValuesSize;

@@ -14,7 +14,7 @@ void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
     std::string topic = msg->get_topic();
     double reading = std::stod(msg->get_payload_str());
     std::string m_sensorId;
-
+    size_t lastSlashPos = topic.find_last_of('/');
     if (topic == "sensors")
     {
         std::vector<std::string> sensorsList = SensorsController::getInstance().getCreatedSensorsList();
@@ -23,12 +23,15 @@ void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
             std::cout << sensor << std::endl;
         }
     }
-    else
+    else if (topic.find("sensors/") == 0 && topic.find("/data") != std::string::npos)
     {
-        size_t lastSlashPos = topic.find_last_of('/');
-        if (lastSlashPos != std::string::npos)
+        size_t start = topic.find("sensors/") + std::string("sensors/").length();
+        size_t end = topic.find("/data");
+        if (end != std::string::npos)
         {
-            m_sensorId = topic.substr(lastSlashPos + 1);
+            m_sensorId = topic.substr(start, end - start);
+            double averageReading = SensorsController::getInstance().calculateSensorData(m_sensorId);
+            return;
         }
         else
         {
@@ -36,7 +39,15 @@ void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
             return;
         }
     }
-
+    if (lastSlashPos != std::string::npos)
+    {
+        m_sensorId = topic.substr(lastSlashPos + 1);
+    }
+    else
+    {
+        std::cerr << "Unexpected topic format: " << topic << std::endl;
+        return;
+    }
     storeSensorReading(m_sensorId, reading);
 }
 

@@ -25,7 +25,7 @@ public:
     std::string getSensorData(const std::string& sensorType);
     std::string getSpecificSensorData(const std::string& requestedSensorId);
     std::vector<std::string> getCreatedSensorsList();
-
+    double calculateSensorData(const std::string& sensorId);
     static SensorsController& getInstance()
     {
         static SensorsController instance;

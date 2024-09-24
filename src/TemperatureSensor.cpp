@@ -66,3 +66,13 @@ std::string TemperatureSensor::getSpecificSensorData(const std::string& requeste
     }
     return data;
 }
+
+double TemperatureSensor::calculateSensorData()
+{
+    double sum = 0.0;
+    for (const auto& reading : sensorValues)
+    {
+        sum += reading.second;
+    }
+    return sensorValues.empty() ? 0.0 : sum / sensorValues.size();
+}
