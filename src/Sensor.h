@@ -19,16 +19,18 @@ public:
     virtual double generateReading() = 0;
     virtual void run(mqtt::async_client& client) = 0;
     virtual void storeValue(double reading) = 0;
-    virtual std::string getSensorData() = 0;
-    virtual std::string getSpecificSensorData(const std::string& sensorType) = 0;
+    std::string getSpecificSensorData(const std::string& sensorType);
     virtual std::string generateSensorId() const = 0;
     std::string getSensorId() const { return sensorId; }
-    virtual SensorData calculateSensorData() = 0;
+    SensorData calculateSensorData();
 
 protected:
     void publishReading(mqtt::async_client& client, const std::string& topic, double value);
     std::string sensorId;
     size_t maxSensorValuesSize;
+    std::mutex sensorMutex;
+    std::deque<std::pair<std::string, double>> sensorValues;
+
 };
 
 #endif // SENSOR_H

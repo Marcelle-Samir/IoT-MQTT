@@ -106,20 +106,6 @@ void SensorsController::storeValue(const std::string& sensorId, double reading)
 
 }
 
-std::string SensorsController::getSensorData(const std::string& sensorType)
-{
-    std::string data;
-    for (const auto& sensor : sensors)
-    {
-        if (sensor->getSensorId() == sensorType)
-        {
-            data = sensor->getSensorData();
-            break;
-        }
-    }
-    return data;
-}
-
 std::string SensorsController::getSpecificSensorData(const std::string& requestedSensorId)
 {
 

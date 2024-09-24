@@ -23,7 +23,6 @@ public:
 
     std::deque<std::pair<std::string, double>> getSensorValues() const { return sensorValues; }
     void storeValue(const std::string& sensorId, double reading);
-    std::string getSensorData(const std::string& sensorType);
     std::string getSpecificSensorData(const std::string& requestedSensorId);
     std::vector<std::string> getCreatedSensorsList();
     SensorData calculateSensorData(const std::string& sensorId);

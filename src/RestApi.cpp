@@ -27,21 +27,6 @@ void RestApi::setupRoutes()
     httpEndpoint.setHandler(router.handler());
 }
 
-void RestApi::getAllSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
-{
-    auto sensorType = request.param(":sensorType").as<std::string>();
-    try
-    {
-        std::string data = sensorsController.getSensorData(sensorType);
-        response.send(Pistache::Http::Code::Ok, data);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error getting sensor data: " << e.what() << std::endl;
-        response.send(Pistache::Http::Code::Internal_Server_Error, "Error retrieving data");
-    }
-}
-
 void RestApi::getSpecificSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response)
 {
     try
