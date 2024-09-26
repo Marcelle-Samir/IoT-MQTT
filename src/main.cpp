@@ -1,10 +1,12 @@
 #include <iostream>
+#include <thread>
 #include "SensorsController.h"
 #include "RestApi.h"
+#include "gRPCServer.h"
 
 int main()
 {
-    std::cout << __FUNCTION__ << " is Called." << std::endl;
+    std::cout << "Main is Called." << std::endl;
 
     SensorsController& m_SensorsController = SensorsController::getInstance();
 
@@ -14,6 +16,12 @@ int main()
         restApi.start();
     });
     restApiThread.detach();
+
+    gRPCServer grpcServer(m_SensorsController, std::string("0.0.0.0:50051"));
+    std::thread grpcThread([&grpcServer]() {
+        grpcServer.Run();
+    });
+    grpcThread.detach();
 
     std::this_thread::sleep_for(std::chrono::hours(1));
 

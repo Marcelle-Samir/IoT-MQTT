@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package sensor;
+
+service SensorService {
+    rpc GetSensorData(SensorRequest) returns (SensorData);
+    rpc CalculateSensorData(SensorData) returns (SensorData);
+    rpc ListAllSensors(Empty) returns (SensorList);
+}
+
+message SensorData {
+    double averageReading = 1;
+    double minReading = 2;
+    double maxReading = 3;
+    string sensortype = 4;
+    string data = 5;
+}
+
+message SensorRequest {
+    string sensor_type = 1;
+}
+
+message Empty {}
+
+message SensorList {
+    repeated string sensors = 1;
+}
+

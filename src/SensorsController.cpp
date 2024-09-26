@@ -161,7 +161,8 @@ SensorData SensorsController::calculateSensorData(const std::string& sensorId)
     SensorData m_sensorData;
     for (const auto& sensor : sensors)
     {
-        if (sensor->getSensorId() == sensorId) {
+        if (sensor->getSensorId() == sensorId)
+        {
             m_sensorData = sensor->calculateSensorData();
             break;
         }
