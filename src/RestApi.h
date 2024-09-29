@@ -16,6 +16,7 @@ public:
     void getSpecificSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
     void listAllSensors(const Pistache::Rest::Request&, Pistache::Http::ResponseWriter response);
     void calculateSensorData(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
+    void addSensor(const Pistache::Rest::Request& request, Pistache::Http::ResponseWriter response);
 
 private:
     SensorsController& sensorsController;

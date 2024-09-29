@@ -31,7 +31,7 @@ public:
         static SensorsController instance;
         return instance;
     }
-
+    std::string addSensor(std::string sensorType);
 private:
     SensorsController();
     ~SensorsController();

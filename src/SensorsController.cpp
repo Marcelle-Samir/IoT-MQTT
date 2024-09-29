@@ -53,6 +53,37 @@ void SensorsController::createSensors()
     lightSensorThreadSec.detach();
 }
 
+std::string SensorsController::addSensor(std::string sensorType)
+{
+    if(sensorType == "Temperature")
+    {
+        std::string newTemperatureSensorId= "Temperature_" + std::to_string(sensorIdCounter++);
+        std::unique_ptr<TemperatureSensor> newTemperatureSensor;
+        std::thread newTempSensorThread;
+        newTemperatureSensor = std::make_unique<TemperatureSensor>(LIGHT_SENSORS_READINGS_LIMIT, newTemperatureSensorId);
+        newTempSensorThread = std::thread(&TemperatureSensor::run, newTemperatureSensor.get(), std::ref(client));
+        sensors.push_back(std::move(newTemperatureSensor));
+        newTempSensorThread.detach();
+        return newTemperatureSensorId;
+    }
+    else if(sensorType == "Light")
+    {
+        std::string newLightSensorId= "Light_" + std::to_string(sensorIdCounter++);
+        std::unique_ptr<TemperatureSensor> newLightSensor;
+        std::thread newLightSensorThread;
+        newLightSensor = std::make_unique<TemperatureSensor>(LIGHT_SENSORS_READINGS_LIMIT, newLightSensorId);
+        newLightSensorThread = std::thread(&TemperatureSensor::run, newLightSensor.get(), std::ref(client));
+        sensors.push_back(std::move(newLightSensor));
+        newLightSensorThread.detach();
+        return newLightSensorId;
+    }
+    else
+    {
+        std::cerr << "Error getting specific sensor data: " << sensorType << std::endl;
+        return "ERROR";
+    }
+}
+
 SensorsController::~SensorsController()
 {
     std::cout << __FUNCTION__ << " is Called." << std::endl;
