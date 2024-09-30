@@ -17,7 +17,7 @@ int main()
     });
     restApiThread.detach();
 
-    gRPCServer grpcServer(m_SensorsController, std::string("0.0.0.0:50051"));
+    gRPCServer grpcServer(m_SensorsController, std::string("172.17.0.2:50051"));
     std::thread grpcThread([&grpcServer]() {
         grpcServer.Run();
     });

@@ -1,4 +1,5 @@
 #include "RestApi.h"
+#include <nlohmann/json.hpp>
 
 RestApi::RestApi(const Pistache::Address& address, SensorsController& controller)
     : sensorsController(controller), httpEndpoint(address)
@@ -23,7 +24,7 @@ void RestApi::setupRoutes()
     Routes::Get(router, "/sensors", Routes::bind(&RestApi::listAllSensors, this));
     Routes::Get(router, "/sensors/:sensorType", Routes::bind(&RestApi::getSpecificSensorData, this));
     Routes::Get(router, "/sensors/:sensorType/data", Routes::bind(&RestApi::calculateSensorData, this));
-    Routes::Get(router, "/create/:sensorType/", Routes::bind(&RestApi::addSensor, this));
+    Routes::Post(router, "/sensors", Routes::bind(&RestApi::addSensor, this));
 
     httpEndpoint.setHandler(router.handler());
 }
@@ -95,14 +96,26 @@ void RestApi::addSensor(const Pistache::Rest::Request& request, Pistache::Http::
 {
     try
     {
-        auto sensorType = request.param(":sensorType").as<std::string>();
-        std::string sensorID = sensorsController.addSensor(sensorType);
-        std::cout << "A new sensor created with ID: " << sensorID << std::endl;
-        response.send(Pistache::Http::Code::Ok, sensorID + " \n");
+        auto body = request.body();
+        std::cout << "Received POST body: " << body << std::endl;
+
+        nlohmann::json jsonData = nlohmann::json::parse(body);
+        if (jsonData.contains("sensorType"))
+        {
+            std::string sensorType = jsonData["sensorType"];
+            std::string sensorID = sensorsController.addSensor(sensorType);
+            std::cout << "A new sensor created with ID: " << sensorID << std::endl;
+
+            response.send(Pistache::Http::Code::Ok, sensorID + " \n");
+        }
+        else
+        {
+            response.send(Pistache::Http::Code::Bad_Request, "Missing sensorType in request body");
+        }
     }
     catch (const std::exception& e)
     {
         std::cerr << "Error adding a new sensor : " << e.what() << std::endl;
-        response.send(Pistache::Http::Code::Internal_Server_Error, "Error retrieving data");
+        response.send(Pistache::Http::Code::Internal_Server_Error, "Error adding new sensor");
     }
 }

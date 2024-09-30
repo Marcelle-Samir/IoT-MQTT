@@ -22,6 +22,8 @@ grpc::Status gRPCServer::GetSensorData(grpc::ServerContext* context,
                                         const sensor::SensorRequest* request,
                                         sensor::SensorData* response)
 {
+    std::cout << "##########gRPCServer::GetSensorData is Called." << std::endl;
+
     try
     {
         std::string sensorType = request->sensor_type();
