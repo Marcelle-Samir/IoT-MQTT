@@ -5,6 +5,8 @@ src/MQTTCallback.h
 src/MQTTCallback.cpp
 src/gRPCServer.h
 src/gRPCServer.cpp
+src/gRPCClient.h
+src/gRPCClient.cpp
 src/RestApi.h
 src/RestApi.cpp
 src/Sensor.h

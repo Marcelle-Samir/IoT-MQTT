@@ -6,6 +6,7 @@ service SensorService {
     rpc GetSensorData(SensorRequest) returns (SensorData);
     rpc CalculateSensorData(SensorData) returns (SensorData);
     rpc ListAllSensors(Empty) returns (SensorList);
+    rpc GetSensorsList(SensorRequest) returns (SensorList);
 }
 
 message SensorData {
@@ -25,4 +26,3 @@ message Empty {}
 message SensorList {
     repeated string sensors = 1;
 }
-

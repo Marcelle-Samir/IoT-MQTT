@@ -18,43 +18,40 @@ void gRPCServer::Run()
     server->Wait();
 }
 
-grpc::Status gRPCServer::GetSensorData(grpc::ServerContext* context,
-                                        const sensor::SensorRequest* request,
-                                        sensor::SensorData* response)
+grpc::Status gRPCServer::GetSensorData(grpc::ServerContext* context, const sensor::SensorRequest* request, sensor::SensorData* response)
 {
-    std::cout << "##########gRPCServer::GetSensorData is Called." << std::endl;
+    std::cout << "GetSensorData is Called." << std::endl;
 
-    try
-    {
-        std::string sensorType = request->sensor_type();
-        std::string data = sensorsController.getSpecificSensorData(sensorType);
+    std::string sensorType = request->sensor_type();
+    std::string data = sensorsController.getSpecificSensorData(sensorType);
 
-        if (data.empty())
-        {
-            return grpc::Status(grpc::NOT_FOUND, "Sensor data not found");
-        }
-        else
-        {
-            response->set_data(data);
-            return grpc::Status::OK;
-        }
+    if (data.empty()) {
+        return grpc::Status(grpc::NOT_FOUND, "Sensor data not found");
     }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error getting specific sensor data: " << e.what() << std::endl;
-        return grpc::Status(grpc::INTERNAL, "Error retrieving data");
-    }
+
+    response->set_data(data);
+    return grpc::Status::OK;
 }
 
-grpc::Status gRPCServer::ListAllSensors(grpc::ServerContext* context,
-                                         const sensor::Empty* request,
-                                         sensor::SensorList* response)
+grpc::Status gRPCServer::ListAllSensors(grpc::ServerContext* context, const sensor::Empty* request, sensor::SensorList* response)
 {
     auto sensorsList = sensorsController.getCreatedSensorsList();
-    for (const auto& sensor : sensorsList)
-    {
+    for (const auto& sensor : sensorsList) {
         response->add_sensors(sensor);
     }
+
+    return grpc::Status::OK;
+}
+
+grpc::Status gRPCServer::GetSensorsList(grpc::ServerContext* context, const sensor::SensorRequest* request, sensor::SensorList* response)
+{
+    std::cout << "GetSensorsList is Called." << std::endl;
+
+    auto sensorsList = sensorsController.getCreatedSensorsList();
+    for (const auto& sensor : sensorsList) {
+        response->add_sensors(sensor);
+    }
+
     return grpc::Status::OK;
 }
 
@@ -68,12 +65,6 @@ grpc::Status gRPCServer::CalculateSensorData(grpc::ServerContext* context, const
     response->set_minreading(customData.minReading);
     response->set_maxreading(customData.maxReading);
     response->set_sensortype(customData.sensortype);
-
-    if (customData.averageReading == 0.0 &&
-        customData.minReading == std::numeric_limits<double>::max() &&
-        customData.maxReading == std::numeric_limits<double>::min())
-    {
-    }
 
     return grpc::Status::OK;
 }
